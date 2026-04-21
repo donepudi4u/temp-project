@@ -1,12 +1,10 @@
 let clients = JSON.parse(pm.collectionVariables.get("clients_config"));
 let selected = pm.environment.get("selected_app");
 
-let apps = Object.keys(clients).map(app => {
-    return {
-        name: app,
-        selected: app === selected
-    };
-});
+let apps = Object.keys(clients).map(app => ({
+    name: app,
+    selected: app === selected
+}));
 
 let template = `
 <h2>Developer Apps</h2>
@@ -32,12 +30,21 @@ let template = `
 
 <script>
 function selectApp(appName) {
-    pm.environment.set("selected_app", appName);
-    alert("Selected app updated to: " + appName);
-
-    // Optional: auto re-run request (manual refresh needed otherwise)
+    window.postMessage({
+        type: 'setSelectedApp',
+        value: appName
+    }, '*');
 }
 </script>
 `;
 
 pm.visualizer.set(template, { apps, selected });
+
+
+// 👇 THIS listens to UI events and updates Postman variables
+pm.visualizer.on('message', function(event) {
+    if (event.data.type === 'setSelectedApp') {
+        pm.environment.set("selected_app", event.data.value);
+        console.log("Updated selected_app to:", event.data.value);
+    }
+});
