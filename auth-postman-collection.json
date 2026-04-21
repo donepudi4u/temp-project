@@ -1,0 +1,116 @@
+{
+  "info": {
+    "name": "Auth Token Manager",
+    "_postman_id": "a1b2c3d4-e5f6-7890-1234-56789abcdef0",
+    "description": "Collection to generate and manage OAuth tokens using selected developer app",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get Access Token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "grant_type",
+              "value": "client_credentials"
+            },
+            {
+              "key": "client_id",
+              "value": "{{client_id}}"
+            },
+            {
+              "key": "client_secret",
+              "value": "{{client_secret}}"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{token_url}}",
+          "host": ["{{token_url}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "let clients = JSON.parse(pm.environment.get(\"clients_config\"));",
+              "let selected = pm.environment.get(\"selected_app\");",
+              "",
+              "if (!selected) {",
+              "    throw new Error(\"selected_app is not set\");",
+              "}",
+              "",
+              "if (!clients[selected]) {",
+              "    throw new Error(\"Invalid selected_app: \" + selected);",
+              "}",
+              "",
+              "pm.environment.set(\"client_id\", clients[selected].client_id);",
+              "pm.environment.set(\"client_secret\", clients[selected].client_secret);",
+              "",
+              "console.log(\"Using App:\", selected);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "let response = pm.response.json();",
+              "",
+              "if (!response.access_token) {",
+              "    throw new Error(\"No access_token in response\");",
+              "}",
+              "",
+              "let selected = pm.environment.get(\"selected_app\");",
+              "",
+              "// Store common token",
+              "pm.environment.set(\"access_token\", response.access_token);",
+              "",
+              "// Store app-specific token",
+              "pm.environment.set(selected + \"_token\", response.access_token);",
+              "",
+              "console.log(\"Token saved for:\", selected);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "List Developer Apps",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "https://postman-echo.com/get",
+          "host": ["postman-echo", "com"],
+          "path": ["get"]
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "let clients = JSON.parse(pm.environment.get(\"clients_config\"));",
+              "",
+              "console.log(\"Available Developer Apps:\");",
+              "Object.keys(clients).forEach(app => console.log(app));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
