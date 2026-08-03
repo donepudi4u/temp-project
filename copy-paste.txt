@@ -1,0 +1,16 @@
+
+Story 1
+
+Summary: Add program eligibility flag to application API response (PTC eligibility flag)
+Description:
+Add a new field to the existing application response payload indicating whether the applicant is eligible for the program (PTC program). Field name to be confirmed with Synapse; implement as PTCEligibilityFlag (camelCase) in the API response and database mapping.
+Ensure the field is non-breaking: when Synapse does not provide the flag, API should return false/null (per spec) and not break clients.
+Update backend mapping, DTOs, and API contract. Add automated tests (unit + integration) and update API docs.
+Coordinate with Synapse team to confirm final field name and value semantics before final QA; make field name configurable/mapped if needed.
+Acceptance Criteria:
+API response for application includes a PTCEligibilityFlag boolean (or agreed type) in the application payload.
+If Synapse supplies eligibility=true, API returns true. If Synapse supplies false or does not supply the field, API returns false (or null per agreed contract) and no errors occur.
+Existing clients and endpoints are unaffected when the field is absent (backwards compatibility verified).
+Unit tests cover mapping logic; integration tests validate behavior with mocked Synapse responses.
+API documentation updated to include the field name, type, possible values and semantics.
+Jira dependency created/linked for final Synapse field-name confirmation and test support.
