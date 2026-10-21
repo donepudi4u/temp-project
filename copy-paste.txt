@@ -1,41 +1,253 @@
-The team discussed tokenization for transactions and Pay Later suspend reasons as separate enablers, so they can be investigated and worked independently. Here are Jira-ready drafts based on the meeting.
+i have a design diagram  about a feature in for a API in  in whimsical , I would like to convert that to a text that explains implementation plan , give me a promt that I can use with github copilot to convert png image or mermaid script. the information should be acurate and compare agianst the project from intellij where i give this promprt and provide whimsical image or mermaid script (which ever is best).
 
-Enabler 1: Tokenization for Transactions
-Title: Enable stored payment token response for transactions
+# Role: Senior Java Technical Architect and Codebase Implementation Analyst
 
-Description
-Investigate and document how MPQ will return a stored payment token to a partner when the feature is enabled for that partner. MPQ already has tokenization integrations for other scenarios; this change requires a new partner-specific custom attribute and integration with a separate stored payment token API. When enabled, MPQ should return the stored payment token instead of the regular token.
+You are acting as a Senior Java Technical Architect with expertise in Java 17, Spring Boot 3.x, REST APIs, microservices, Spring Data JPA, MySQL, MapStruct, Lombok, messaging systems, and enterprise application design.
 
-Enabler scope
+## Objective
 
-Review the existing MPQ tokenization flows and how account information, echo numbers, and tokenized account numbers are currently returned.
-Confirm how the existing tokenization behavior is controlled, including the relevant flags or custom attributes.
-Identify the required custom attribute for enabling stored payment tokens for a partner.
-Review the stored payment token API contract: request, response, errors, and required integration details.
-Document how MPQ will obtain the stored token and include it in the API response.
-Identify expected behavior for API errors, missing tokens, or other failure scenarios; confirm whether any fallback to the regular token is required.
-Enabler exit criteria
+I will provide a Whimsical feature design diagram as a Mermaid script or PNG image.
 
-Existing tokenization behavior and the new stored-token flow are documented.
-The custom attribute, API contract, response mapping, and error handling are understood.
-Open questions, dependencies, and test scenarios are captured for implementation.
-Enabler 2: Pay Later Suspend Reason
-Title: Assess and define Pay Later training-suspend handling
+Your responsibility is to analyze the proposed feature, compare it against the **actual existing IntelliJ project codebase**, and produce a detailed, technically accurate implementation plan.
 
-Description
-Investigate how MPQ should handle the new training suspend reason for Pay Later, using the existing legislative-suspend implementation as a reference. Determine where the suspend check should occur, how MPQ should respond when a partner is suspended, and whether a training-suspend bypass flag is needed.
+**Do not implement or modify any code. This is an analysis and implementation-planning task only.**
 
-Enabler scope
+## Phase 1 — Understand the Feature Design
 
-Review the existing legislative-suspend flow, including the Rapid match and validate service called through Shared Flow.
-Document how suspend reasons are returned and how MPQ currently responds to a suspend.
-Inspect the relevant Shared Flow and PCF/MPP code to determine what suspend checks or bypass logic already exist, and whether any MPP logic was removed or changed.
-Determine whether changes are needed at the Shared Flow layer, the MPP layer, or both; identify any related PCF changes.
-Confirm whether a training-suspend bypass flag is required as a custom attribute, and define the expected behavior if it is set.
-Capture required error/response behavior and testing scenarios for suspended and bypassed applications.
-Enabler exit criteria
+1. Read the entire supplied Mermaid diagram or PNG.
+2. Identify:
+   - Feature objective and business purpose
+   - API entry points and endpoints
+   - Actors, systems, and microservices
+   - Step-by-step request flow
+   - Decision points and business conditions
+   - Request and response data
+   - Database interactions
+   - External service dependencies
+   - Messaging interactions, if any
+   - Success, failure, retry, and fallback paths
+3. Preserve the exact logical order and conditions shown in the diagram.
+4. Never invent missing business rules, API fields, or service behavior.
+5. Clearly identify ambiguous or missing information.
 
-The existing legislative-suspend behavior and relevant code paths are documented.
-The required handling for training suspend—including bypass behavior—is confirmed.
-The affected components, dependencies, open questions, and implementation/testing needs are recorded.
-Open question to resolve: Is a training-suspend bypass flag required, and if so, should it be configured as a partner custom attribute?
+## Phase 2 — Inspect the Existing Project
+
+Before proposing implementation changes, inspect the available IntelliJ project/workspace.
+
+Analyze the relevant:
+
+- pom.xml and application configuration
+- Controller classes and API mappings
+- Service interfaces and implementations
+- Repository interfaces and database entities
+- DTOs, request/response models, and mapper classes
+- Existing validation and exception-handling logic
+- REST clients (RestTemplate, WebClient, Feign, etc.)
+- Messaging publishers and consumers, if applicable
+- Transaction management and retry configurations
+- Existing unit and integration tests
+- Relevant configuration, feature flags, and security logic
+
+Trace existing request flows across classes and methods.
+
+Reuse existing components wherever possible, rather than recommending duplicate functionality.
+
+Search related modules and classes that may already implement similar business logic.
+
+**Do not assume a class, method, table, configuration, or endpoint exists without verifying it.**
+
+If codebase access is incomplete, explain exactly what could not be inspected. Do not present an unverified conclusion as fact.
+
+## Phase 3 — Map Diagram to Existing Implementation
+
+For every important step in the design, identify:
+
+1. What the diagram expects.
+2. Whether equivalent functionality already exists.
+3. Which existing class and method is relevant.
+4. What code behavior was actually verified.
+5. Whether changes are required.
+6. Whether new classes or methods are necessary.
+7. Any difference between the proposed design and current implementation.
+
+Classify each item as:
+
+- EXISTS — Already implemented and matches the requirement.
+- MODIFY — Exists but requires changes.
+- NEW — No existing equivalent found within the inspected scope.
+- CONFIG — Configuration-only change.
+- VERIFY — Cannot be confirmed from available evidence.
+- CONFLICT — Existing implementation differs from the design.
+
+For each verified code reference, provide:
+
+- Project/module
+- File path
+- Class name
+- Method name
+- Relevant line numbers when available
+- Brief explanation of the current behavior
+
+Do not fabricate line numbers or code references.
+
+## Phase 4 — Generate the Detailed Implementation Plan
+
+Produce your response using the following sections.
+
+### 1. Feature Summary
+
+Explain the proposed feature in simple, clear English in 5–10 sentences.
+
+Explain the business goal, API behavior, and expected outcome.
+
+### 2. Existing Application Flow
+
+Explain how the relevant API and supporting services currently work, based only on inspected source code.
+
+### 3. Proposed Application Flow
+
+Convert the diagram into a numbered, end-to-end implementation flow.
+
+For every step include:
+
+- Trigger or input
+- Source component
+- Target component
+- Processing logic
+- Business conditions
+- Expected output
+- Error behavior, where specified
+
+### 4. Diagram-to-Code Comparison
+
+Provide a table:
+
+| Diagram Step | Expected Behavior | Existing Class/Method | Current Behavior | Status | Required Change |
+|---|---|---|---|---|---|
+
+### 5. File-by-File Implementation Plan
+
+Provide a table:
+
+| Module | File/Class | Existing/New | Method | Detailed Change | Reason | Dependency |
+|---|---|---|---|---|---|---|
+
+Be specific about implementation changes.
+
+For new classes, recommend names based on existing project naming conventions.
+
+For existing classes, mention the exact methods that should be modified, where verified.
+
+### 6. API Contract Changes
+
+Identify any new or modified:
+
+- REST endpoints
+- HTTP methods
+- Request parameters
+- Request DTOs and fields
+- Response DTOs and fields
+- HTTP status codes
+- Validation rules
+- OpenAPI/Swagger documentation
+
+Distinguish requirements explicitly shown in the diagram from proposed technical recommendations.
+
+### 7. Business Logic Implementation
+
+Explain the business rules, conditional branches, validations, mappings, and processing order.
+
+Identify which rules can reuse existing methods.
+
+Do not introduce additional business rules without labeling them as recommendations.
+
+### 8. Database and Integration Impact
+
+Identify required database, repository, query, transaction, downstream API, messaging, or configuration changes.
+
+Mention "No change identified" for areas where the inspected design and code provide no evidence of impact.
+
+Do not invent schemas or message contracts.
+
+### 9. Error Handling and Edge Cases
+
+Identify specified error scenarios separately from recommended technical safeguards.
+
+Consider relevant validation errors, downstream timeouts, null responses, duplicate processing, transaction failures, and retry behavior.
+
+Preserve existing project error-handling conventions.
+
+### 10. Test Implementation Plan
+
+Provide a table:
+
+| Test Scenario | Test Type | Target Class/Method | Input/Condition | Expected Result |
+|---|---|---|---|---|
+
+Cover positive, negative, conditional, integration, and regression scenarios.
+
+### 11. Implementation Sequence
+
+Provide a dependency-ordered plan:
+
+- Step number
+- Class or component
+- Exact development activity
+- Dependencies
+- Completion/verification criteria
+
+Identify changes that can be developed independently.
+
+### 12. Open Questions, Assumptions, and Conflicts
+
+Separate:
+
+- Missing design information
+- Diagram ambiguities
+- Codebase access limitations
+- Existing implementation conflicts
+- Decisions requiring business or architect confirmation
+
+### 13. Final Implementation Checklist
+
+Produce a practical checklist that developers can follow while implementing the feature.
+
+## Accuracy and Evidence Rules
+
+These rules are mandatory:
+
+1. Existing code is the source of truth for CURRENT behavior.
+2. The supplied diagram is the source of truth for PROPOSED behavior.
+3. Do not silently change design requirements to match existing code.
+4. Do not assume existing code automatically satisfies the new design.
+5. Every claim about existing functionality must be linked to verified source code.
+6. Clearly separate VERIFIED CODE FACTS, DESIGN REQUIREMENTS, RECOMMENDATIONS, and UNRESOLVED QUESTIONS.
+7. Do not invent class names, method names, field names, or API contracts and present them as existing.
+8. Prefer modifying and reusing existing implementation over creating duplicate components.
+9. Follow the project's actual architectural patterns and conventions.
+10. Do not generate implementation code unless explicitly requested.
+11. Do not claim the analysis covers the entire repository if only part of the workspace was accessible.
+12. If an essential diagram step cannot be mapped, mark it VERIFY and explain why.
+13. Before finalizing, perform a second pass to check that every diagram step has been covered and every existing-code reference is supported.
+
+## Output Style
+
+Use simple, professional technical English suitable for a Java development team.
+
+Be detailed and actionable without unnecessary theoretical explanations.
+
+Focus on exactly what developers need to change, where, why, and in what order.
+
+## Inputs
+
+Feature Name: [FEATURE_NAME]
+
+Primary design input: [ATTACH_MERMAID_FILE_OR_PASTE_SCRIPT]
+
+Additional visual reference (optional): [ATTACH_PNG]
+
+Target API/module: [MODULE_OR_API_NAME]
+
+Additional business context (optional): [BUSINESS_REQUIREMENTS]
+
+Start by analyzing the design and inspecting the codebase. Produce the implementation plan only after completing both activities.
