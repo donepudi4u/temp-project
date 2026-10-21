@@ -1,16 +1,25 @@
+Jira Enabler Summary: MPQ Proof Integration
+Title: Enable MPQ integration with Synapse proof verification API
 
-Story 1
+Description
+Enable MPQ to receive the proof/prefill identifier from the client and use it to retrieve proof-verification details from Synapse. MPQ will then process the application and send the application information, including the proof details, to Synapse as part of the existing application flow.
 
-Summary: Add program eligibility flag to application API response (PTC eligibility flag)
-Description:
-Add a new field to the existing application response payload indicating whether the applicant is eligible for the program (PTC program). Field name to be confirmed with Synapse; implement as PTCEligibilityFlag (camelCase) in the API response and database mapping.
-Ensure the field is non-breaking: when Synapse does not provide the flag, API should return false/null (per spec) and not break clients.
-Update backend mapping, DTOs, and API contract. Add automated tests (unit + integration) and update API docs.
-Coordinate with Synapse team to confirm final field name and value semantics before final QA; make field name configurable/mapped if needed.
-Acceptance Criteria:
-API response for application includes a PTCEligibilityFlag boolean (or agreed type) in the application payload.
-If Synapse supplies eligibility=true, API returns true. If Synapse supplies false or does not supply the field, API returns false (or null per agreed contract) and no errors occur.
-Existing clients and endpoints are unaffected when the field is absent (backwards compatibility verified).
-Unit tests cover mapping logic; integration tests validate behavior with mocked Synapse responses.
-API documentation updated to include the field name, type, possible values and semantics.
-Jira dependency created/linked for final Synapse field-name confirmation and test support.
+The client is expected to integrate with Synapse’s application prefill API before calling MPQ. That API is owned by Synapse and has six endpoints across three flows. MPQ’s work begins when it receives the identifier from the client.
+
+Scope
+Add a field to the MPQ request to receive the proof/prefill identifier. The transcript refers to this as both a flow ID and prefill ID; confirm the final field name.
+Call the Synapse proof API using that identifier and retrieve proof-specific information.
+Use the returned proof information when processing and submitting the application to Synapse.
+Review and document the Synapse API’s Swagger details, request and success-response formats, and error scenarios.
+Assess connectivity from MPQ environments to the Synapse API, including required network and infrastructure changes.
+Technical considerations and dependencies
+The Synapse API is hosted on AWS EKS. Verify connectivity from the PCF non-production environment first.
+Confirm the path and approvals needed for production connectivity from on-premises MPQ to AWS.
+Identify any required firewall rules, access permissions, or other infrastructure changes.
+If connectivity is blocked, engage the Ecom team and Synapse team to determine an alternative, such as an API deployment in another environment.
+MPQ should pass the identifier to Synapse without validating its format. Synapse is expected to validate it; an unknown identifier may return 404 Not Found.
+Enabler exit criteria
+The request-field name and API contract are documented.
+Synapse success and error scenarios, including not-found behavior, are understood.
+Non-production and production connectivity paths, required approvals, and blockers are documented.
+Open questions and dependencies are captured so implementation can proceed when resolved.
