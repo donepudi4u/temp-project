@@ -1,253 +1,482 @@
-i have a design diagram  about a feature in for a API in  in whimsical , I would like to convert that to a text that explains implementation plan , give me a promt that I can use with github copilot to convert png image or mermaid script. the information should be acurate and compare agianst the project from intellij where i give this promprt and provide whimsical image or mermaid script (which ever is best).
-
-# Role: Senior Java Technical Architect and Codebase Implementation Analyst
-
-You are acting as a Senior Java Technical Architect with expertise in Java 17, Spring Boot 3.x, REST APIs, microservices, Spring Data JPA, MySQL, MapStruct, Lombok, messaging systems, and enterprise application design.
+# Role: Senior Java Technical Architect and API Design Analyst
 
 ## Objective
 
-I will provide a Whimsical feature design diagram as a Mermaid script or PNG image.
+Analyze the supplied Mermaid feature design and compare it against the existing Java Spring Boot application in the IntelliJ workspace.
 
-Your responsibility is to analyze the proposed feature, compare it against the **actual existing IntelliJ project codebase**, and produce a detailed, technically accurate implementation plan.
+Produce a clear, accurate, developer-friendly **Functional and Technical API Implementation Specification**.
 
-**Do not implement or modify any code. This is an analysis and implementation-planning task only.**
+The document should explain **what needs to be implemented and how the API should behave**, rather than prescribing code modifications at individual Java class or method level.
 
-## Phase 1 — Understand the Feature Design
+### Existing API
 
-1. Read the entire supplied Mermaid diagram or PNG.
-2. Identify:
-   - Feature objective and business purpose
-   - API entry points and endpoints
-   - Actors, systems, and microservices
-   - Step-by-step request flow
-   - Decision points and business conditions
-   - Request and response data
-   - Database interactions
-   - External service dependencies
-   - Messaging interactions, if any
-   - Success, failure, retry, and fallback paths
-3. Preserve the exact logical order and conditions shown in the diagram.
-4. Never invent missing business rules, API fields, or service behavior.
-5. Clearly identify ambiguous or missing information.
+- Internal endpoint: `/offers/eop/lookup`
+- Already implemented in the application.
+- Use its existing behavior, payload contracts, validations, and processing flow as the baseline.
 
-## Phase 2 — Inspect the Existing Project
+### Proposed API
 
-Before proposing implementation changes, inspect the available IntelliJ project/workspace.
+- Proposed external Apigee Edge proxy path: `/proxy/offers/eop/lookup`
+- The new API will follow the existing internal endpoint's functionality, with changes specified in the supplied Mermaid diagram.
+- Existing internal API behavior should remain unaffected.
 
-Analyze the relevant:
+### Inputs
 
-- pom.xml and application configuration
-- Controller classes and API mappings
-- Service interfaces and implementations
-- Repository interfaces and database entities
-- DTOs, request/response models, and mapper classes
-- Existing validation and exception-handling logic
-- REST clients (RestTemplate, WebClient, Feign, etc.)
-- Messaging publishers and consumers, if applicable
-- Transaction management and retry configurations
-- Existing unit and integration tests
-- Relevant configuration, feature flags, and security logic
+1. Mermaid script exported from Whimsical.
+2. Existing IntelliJ project source code.
+3. Available application configuration and API documentation.
 
-Trace existing request flows across classes and methods.
+## Critical Working Instructions
 
-Reuse existing components wherever possible, rather than recommending duplicate functionality.
+**First analyze the actual source code, then prepare the document.**
 
-Search related modules and classes that may already implement similar business logic.
+Inspect relevant controller, service, mapper, DTO, repository, integration, configuration, and validation code internally to understand current behavior.
 
-**Do not assume a class, method, table, configuration, or endpoint exists without verifying it.**
+However:
 
-If codebase access is incomplete, explain exactly what could not be inspected. Do not present an unverified conclusion as fact.
+- Do not document every Java class or method.
+- Do not provide file-by-file implementation instructions.
+- Do not include ServiceImpl, DAO, Repository, or Mapper modification lists.
+- Do not provide code snippets unless essential to explain an API contract.
+- Do not generate or modify application code.
+- Do not overload the document with low-level implementation details.
+- Mention technical components only when important for understanding API behavior or integration requirements.
 
-## Phase 3 — Map Diagram to Existing Implementation
+Focus on API contracts, business behavior, processing flow, integration changes, and missing details.
 
-For every important step in the design, identify:
+**Accuracy is mandatory.** Never guess field names, data types, business rules, or API behavior.
 
-1. What the diagram expects.
-2. Whether equivalent functionality already exists.
-3. Which existing class and method is relevant.
-4. What code behavior was actually verified.
-5. Whether changes are required.
-6. Whether new classes or methods are necessary.
-7. Any difference between the proposed design and current implementation.
+Use the following document structure.
 
-Classify each item as:
+---
 
-- EXISTS — Already implemented and matches the requirement.
-- MODIFY — Exists but requires changes.
-- NEW — No existing equivalent found within the inspected scope.
-- CONFIG — Configuration-only change.
-- VERIFY — Cannot be confirmed from available evidence.
-- CONFLICT — Existing implementation differs from the design.
+# 1. Feature Overview
 
-For each verified code reference, provide:
+Briefly explain:
 
-- Project/module
-- File path
-- Class name
-- Method name
-- Relevant line numbers when available
-- Brief explanation of the current behavior
+- Business purpose of the proposed API.
+- Existing internal API.
+- Proposed external API.
+- Why the external endpoint is needed.
+- High-level changes based on the Mermaid diagram.
 
-Do not fabricate line numbers or code references.
+Clearly differentiate design requirements from verified existing behavior.
 
-## Phase 4 — Generate the Detailed Implementation Plan
+# 2. Existing vs Proposed API Comparison
 
-Produce your response using the following sections.
+Prepare a comparison table:
 
-### 1. Feature Summary
+| Area | Existing Internal API | Proposed External API | Change Required |
+|---|---|---|---|
 
-Explain the proposed feature in simple, clear English in 5–10 sentences.
+Include:
 
-Explain the business goal, API behavior, and expected outcome.
+- API path and HTTP method
+- Accessibility and authentication
+- Request payload
+- Response payload
+- Validation
+- Business processing
+- Downstream integration
+- Error handling
 
-### 2. Existing Application Flow
+Only include applicable differences.
 
-Explain how the relevant API and supporting services currently work, based only on inspected source code.
+Do not assume the Apigee path is also a Spring Boot controller mapping. Verify routing using available evidence; otherwise mark it as an open question.
 
-### 3. Proposed Application Flow
+# 3. Proposed End-to-End Processing Flow
 
-Convert the diagram into a numbered, end-to-end implementation flow.
+Convert the Mermaid design into a numbered, logical processing flow.
 
-For every step include:
+For each step, document:
 
-- Trigger or input
-- Source component
-- Target component
-- Processing logic
-- Business conditions
-- Expected output
-- Error behavior, where specified
-
-### 4. Diagram-to-Code Comparison
-
-Provide a table:
-
-| Diagram Step | Expected Behavior | Existing Class/Method | Current Behavior | Status | Required Change |
-|---|---|---|---|---|---|
-
-### 5. File-by-File Implementation Plan
-
-Provide a table:
-
-| Module | File/Class | Existing/New | Method | Detailed Change | Reason | Dependency |
-|---|---|---|---|---|---|---|
-
-Be specific about implementation changes.
-
-For new classes, recommend names based on existing project naming conventions.
-
-For existing classes, mention the exact methods that should be modified, where verified.
-
-### 6. API Contract Changes
-
-Identify any new or modified:
-
-- REST endpoints
-- HTTP methods
-- Request parameters
-- Request DTOs and fields
-- Response DTOs and fields
-- HTTP status codes
-- Validation rules
-- OpenAPI/Swagger documentation
-
-Distinguish requirements explicitly shown in the diagram from proposed technical recommendations.
-
-### 7. Business Logic Implementation
-
-Explain the business rules, conditional branches, validations, mappings, and processing order.
-
-Identify which rules can reuse existing methods.
-
-Do not introduce additional business rules without labeling them as recommendations.
-
-### 8. Database and Integration Impact
-
-Identify required database, repository, query, transaction, downstream API, messaging, or configuration changes.
-
-Mention "No change identified" for areas where the inspected design and code provide no evidence of impact.
-
-Do not invent schemas or message contracts.
-
-### 9. Error Handling and Edge Cases
-
-Identify specified error scenarios separately from recommended technical safeguards.
-
-Consider relevant validation errors, downstream timeouts, null responses, duplicate processing, transaction failures, and retry behavior.
-
-Preserve existing project error-handling conventions.
-
-### 10. Test Implementation Plan
-
-Provide a table:
-
-| Test Scenario | Test Type | Target Class/Method | Input/Condition | Expected Result |
+| Step | Processing Activity | Business Condition | Expected Behavior | Existing/New/Changed |
 |---|---|---|---|---|
 
-Cover positive, negative, conditional, integration, and regression scenarios.
+Explain:
 
-### 11. Implementation Sequence
+- How the request enters through Apigee Edge.
+- How the backend processes the request.
+- What validations are performed.
+- What business decisions are evaluated.
+- What downstream services are invoked.
+- How the response is produced.
+- How alternate and failure paths are handled.
 
-Provide a dependency-ordered plan:
+Preserve the original diagram's sequence and business conditions.
 
-- Step number
-- Class or component
-- Exact development activity
-- Dependencies
-- Completion/verification criteria
+Avoid Java class and method references unless absolutely necessary.
 
-Identify changes that can be developed independently.
+Do not treat illustrative flows as verified requirements.
 
-### 12. Open Questions, Assumptions, and Conflicts
+# 4. Request Payload — Field-Level Comparison
 
-Separate:
+This is one of the most important sections.
 
-- Missing design information
-- Diagram ambiguities
-- Codebase access limitations
-- Existing implementation conflicts
-- Decisions requiring business or architect confirmation
+Analyze the existing internal API's actual request payload by inspecting its DTOs, serialization behavior, validation rules, and service usage.
 
-### 13. Final Implementation Checklist
+Compare the existing payload against the proposed Mermaid design.
 
-Produce a practical checklist that developers can follow while implementing the feature.
+Create this table:
 
-## Accuracy and Evidence Rules
+| JSON Field / Path | Data Type | Existing API | Proposed API | Required/Optional | Change Type | Description / Gap |
+|---|---|---|---|---|---|---|
 
-These rules are mandatory:
+Change Types:
 
-1. Existing code is the source of truth for CURRENT behavior.
-2. The supplied diagram is the source of truth for PROPOSED behavior.
-3. Do not silently change design requirements to match existing code.
-4. Do not assume existing code automatically satisfies the new design.
-5. Every claim about existing functionality must be linked to verified source code.
-6. Clearly separate VERIFIED CODE FACTS, DESIGN REQUIREMENTS, RECOMMENDATIONS, and UNRESOLVED QUESTIONS.
-7. Do not invent class names, method names, field names, or API contracts and present them as existing.
-8. Prefer modifying and reusing existing implementation over creating duplicate components.
-9. Follow the project's actual architectural patterns and conventions.
-10. Do not generate implementation code unless explicitly requested.
-11. Do not claim the analysis covers the entire repository if only part of the workspace was accessible.
-12. If an essential diagram step cannot be mapped, mark it VERIFY and explain why.
-13. Before finalizing, perform a second pass to check that every diagram step has been covered and every existing-code reference is supported.
+- EXISTING
+- NEW
+- MODIFIED
+- REMOVED
+- CONDITIONAL
+- UNKNOWN
 
-## Output Style
+Requirements:
 
-Use simple, professional technical English suitable for a Java development team.
+1. Identify all relevant existing request fields.
+2. Identify every new field explicitly required by the Mermaid design.
+3. Identify fields whose values or meanings change.
+4. Identify removed or renamed fields, if specified.
+5. Identify mandatory, optional, and conditional fields.
+6. Include nested JSON fields where applicable.
+7. Explain defaults and validations when known.
+8. Mention where field values originate if specified.
+9. Highlight missing or uncertain fields.
 
-Be detailed and actionable without unnecessary theoretical explanations.
+**Do not assume an existing DTO field is mandatory simply because it is declared in Java.**
 
-Focus on exactly what developers need to change, where, why, and in what order.
+If required status, data type, JSON name, default, or mapping is unclear, mark it UNKNOWN.
 
-## Inputs
+If a proposed field is described conceptually but not named in the design, use a descriptive placeholder clearly labeled as UNKNOWN, not a fabricated JSON property.
 
-Feature Name: [FEATURE_NAME]
+Do not classify fields as removed solely because they are absent from the diagram.
 
-Primary design input: [ATTACH_MERMAID_FILE_OR_PASTE_SCRIPT]
+Include existing and proposed example JSON payloads only if their structure is sufficiently verified. Label unknown values clearly.
 
-Additional visual reference (optional): [ATTACH_PNG]
+# 5. Response Payload — Field-Level Comparison
 
-Target API/module: [MODULE_OR_API_NAME]
+Perform equivalent analysis for the API response.
 
-Additional business context (optional): [BUSINESS_REQUIREMENTS]
+| JSON Field / Path | Data Type | Existing Response | Proposed Response | Change Type | Mapping / Description / Gap |
+|---|---|---|---|---|---|
 
-Start by analyzing the design and inspecting the codebase. Produce the implementation plan only after completing both activities.
+Identify:
+
+- Existing fields retained.
+- New response fields.
+- Changed field values or mappings.
+- Conditional response fields.
+- Removed or renamed fields.
+- Differences in response structure.
+- Null handling and missing values.
+- Unknown response requirements.
+
+Mention transformations and source data when applicable.
+
+Do not invent response fields or values.
+
+# 6. Business Rules and Validation Changes
+
+Document the business rules represented in the Mermaid diagram.
+
+| Rule ID | Condition / Validation | Existing Behavior | Proposed Behavior | Gap / Clarification |
+|---|---|---|---|---|
+
+Include:
+
+- New business conditions.
+- Modified validation rules.
+- Conditional processing.
+- Decision branches.
+- Fallback logic.
+- Any differences from the existing internal API.
+
+Describe each rule in simple technical English.
+
+Do not introduce new business logic as a confirmed requirement unless explicitly supported.
+
+# 7. Integration and Apigee Considerations
+
+Document only relevant integration details.
+
+### Apigee Edge
+
+Capture, where known:
+
+- Proposed public proxy path.
+- Backend target path.
+- HTTP method and routing.
+- Authentication and API authorization.
+- Required headers.
+- Header or payload transformations.
+- Request/response policies.
+- Error handling and routing behavior.
+
+### Backend Dependencies
+
+Identify:
+
+- Existing downstream services used.
+- New downstream interactions, if specified.
+- Changed request or response mappings.
+- Data dependencies.
+- Relevant timeout, retry, or failure behavior.
+
+Use this table:
+
+| Integration | Existing Behavior | Proposed Behavior | Change / Dependency / Gap |
+|---|---|---|---|
+
+Do not create a separate class-level implementation section.
+
+If Apigee proxy configuration is unavailable, explicitly state that the configuration could not be verified.
+
+# 8. Error Handling and Edge Cases
+
+Create:
+
+| Scenario | Existing Behavior | Expected New API Behavior | Gap / Question |
+|---|---|---|---|
+
+Include relevant validation failures, business errors, downstream failures, missing fields, and external API error responses.
+
+Do not invent HTTP status codes or error payloads.
+
+Identify any missing error requirements.
+
+# 9. Testing Scenarios
+
+Create a concise test coverage table:
+
+| Test Scenario | Input / Condition | Expected Behavior | Test Category |
+|---|---|---|---|
+
+Cover:
+
+- Main success flow.
+- Changed request fields.
+- New business conditions.
+- Conditional branches.
+- Response mappings.
+- Negative scenarios.
+- Apigee authentication/routing, where specified.
+- Regression testing for the existing internal API.
+
+Keep this focused on functional API behavior rather than individual Java methods.
+
+# 10. Open Questions, Ambiguities, and Missing Requirements
+
+This section is mandatory and must be maintained separately.
+
+Use:
+
+| ID | Area | Open Question / Missing Detail | Why Clarification Is Needed | Impact | Priority |
+|---|---|---|---|---|---|
+
+Specifically identify:
+
+- Missing request fields.
+- Missing response fields.
+- Unknown data types.
+- Unclear required/optional status.
+- Unspecified field sources and mappings.
+- Unclear validation rules.
+- Missing business conditions.
+- Ambiguous diagram branches.
+- Unknown downstream behavior.
+- Undefined error responses.
+- Missing Apigee configuration.
+- Conflicts between the diagram and actual source code.
+- Information that cannot be verified.
+
+**Never fill missing information with assumptions just to complete the document.**
+
+If a detail is uncertain, state it explicitly and add a specific open question.
+
+Avoid generic questions; formulate each question so a business analyst, architect, or API owner can answer it.
+
+# 11. Final Summary
+
+End with a short summary containing:
+
+- Key differences between the existing and proposed APIs.
+- New or changed request payload fields.
+- New or changed response payload fields.
+- Important business rule changes.
+- Integration dependencies.
+- Critical unresolved questions.
+- Recommended implementation considerations.
+
+Do not repeat entire tables or provide Java class-by-class tasks.
+
+---
+
+## Mandatory Accuracy and Quality Checks
+
+Before finalizing:
+
+1. Verify the existing endpoint's actual behavior against the source code.
+2. Check that every Mermaid step and decision branch is represented.
+3. Verify existing payload field names and JSON types.
+4. Identify all new or changed fields shown in the design.
+5. Clearly separate known requirements from unknowns.
+6. Ensure the existing internal API's backward compatibility is considered.
+7. Do not claim a requirement is verified unless supported by the diagram or available code.
+8. Do not assume external Apigee configuration is available in the backend repository.
+9. Do not include unnecessary Java class names, method names, or file paths.
+10. Keep the document concise, technically meaningful, and easy for developers and reviewers to understand.
+
+## Output Requirements
+
+Create a Markdown document named:
+
+`docs/eop-lookup-proxy-implementation-spec.md`
+
+Use professional, simple technical English.
+
+Prefer tables for payloads, business rules, API comparisons, errors, and open questions.
+
+**Target outcome:** Developers should understand WHAT the feature requires, WHAT is changing, WHAT existing behavior can be reused, and WHAT information is missing — without having to read a class-by-class implementation plan.
+
+Do not modify application source code.
+
+Begin by analyzing the Mermaid design and the existing `/offers/eop/lookup` implementation in the IntelliJ project. Generate the documentation only after completing the comparison.
+
+# 8. SynApps Decision System and Database Mapping Changes
+
+The application integrates with a decision-making system named **SynApps**.
+
+The existing `/offers/eop/lookup` API may use incoming request payload fields, database information, derived values, or a combination of these to construct the SynApps request.
+
+Analyze the existing implementation and compare it with the proposed Mermaid design.
+
+The objective is to identify and document **only new or modified mappings**, not every existing mapping.
+
+## 8.1 Existing SynApps Integration Analysis
+
+Inspect the existing code to understand:
+
+- Whether and when `/offers/eop/lookup` invokes SynApps.
+- How the SynApps request is constructed.
+- Which values come directly from the API request payload.
+- Which values are retrieved from the database.
+- Which values are derived or transformed using business logic.
+- How the SynApps response is consumed.
+- Whether SynApps response fields are mapped to the API response or persisted to the database.
+- Any conditional logic controlling which information is sent to SynApps.
+
+Use this analysis internally as the baseline.
+
+Do not reproduce the complete existing SynApps request or response mapping unless necessary to explain a change.
+
+## 8.2 SynApps Request Mapping Changes
+
+Compare the existing SynApps request mappings with the Mermaid design.
+
+Document only NEW, MODIFIED, REMOVED, or CONDITIONAL mappings.
+
+| SynApps Field / JSON Path | Source (API/DB/Derived) | Source Field / DB Column | Existing Mapping | Proposed Mapping | Change Type | Transformation / Condition | Gap |
+|---|---|---|---|---|---|---|---|
+
+For every changed mapping, identify:
+
+1. Exact SynApps field name or JSON path, when verified.
+2. Source of the mapped value: API request, database, constant, or derived value.
+3. Exact source field name or database column, if verified.
+4. Existing mapping behavior.
+5. Proposed mapping behavior.
+6. Required data transformations.
+7. Conditional mappings or default values.
+8. Missing field definitions or unresolved questions.
+
+**Important:**
+
+- Do not assume a new API request field must be sent to SynApps.
+- Do not assume every SynApps field originates from the API request.
+- Verify the actual source of each existing mapped value.
+- If the proposed design requires a field but does not specify its SynApps target, mark the target UNKNOWN.
+- If a new SynApps field has no confirmed source, document the missing source as an open question.
+- Do not list unchanged mappings.
+
+## 8.3 SynApps Response Mapping Changes
+
+Identify any new or modified processing of the SynApps response.
+
+| SynApps Response Field | Existing Usage | Proposed Usage | Target (API/DB/Business Logic) | Change Type | Gap |
+|---|---|---|---|---|---|
+
+Include only differences involving:
+
+- New SynApps response fields.
+- Modified field mappings.
+- New or changed business decisions based on SynApps responses.
+- New fields returned in the external API response.
+- New or modified database persistence requirements.
+- Changes to SynApps error or rejection handling.
+
+Do not assume that every SynApps response field is returned directly to the external API consumer.
+
+## 8.4 Database Mapping Changes
+
+Identify any new or modified database interactions required by the proposed feature.
+
+Compare existing database usage against the Mermaid design.
+
+| Table | Column / JSON Path | Operation (Read/Write) | Existing Mapping | Proposed Mapping | Change Type | Reason / Gap |
+|---|---|---|---|---|---|---|
+
+Capture changes involving:
+
+- New database columns or JSON attributes.
+- Existing columns that must supply different values.
+- New request-to-database mappings.
+- Modified database-to-SynApps mappings.
+- New SynApps-response-to-database mappings.
+- New or changed lookup conditions.
+- Changed persistence or update behavior.
+- New data retrieval requirements.
+
+Distinguish between:
+
+- New database schema requirements.
+- New mapping using an existing database field.
+- Modified mapping using an existing field.
+- Changes in read/write processing.
+
+Do not assume that a new API payload field requires a new database column.
+
+Only report new or modified mappings supported by the design and source-code comparison.
+
+## 8.5 SynApps and Database Mapping Gaps
+
+Add any unresolved mapping requirements to the main **Open Questions / Ambiguities / Missing Requirements** section.
+
+Examples:
+
+- Which SynApps request field should receive a newly introduced API field?
+- Should a particular field come from the API request or the database?
+- Is a new database column required, or can an existing JSON attribute be reused?
+- What should happen if the database value is missing?
+- Does the new external API require a different SynApps request structure?
+- Are new SynApps response fields required in the external API response?
+- Should any new SynApps decision results be persisted?
+- Is the new API expected to change existing SynApps decision rules?
+
+Use specific field names and diagram steps whenever they can be verified.
+
+Do not create generic open questions when the answer is already evident in the code or design.
+
+## 8.6 Reporting Rules
+
+1. Show ONLY new, modified, removed, or conditional mappings.
+2. Do not document unchanged existing SynApps mappings.
+3. Do not document unchanged database mappings.
+4. Do not include Java class names, ServiceImpl methods, DAO methods, or code modification instructions.
+5. Preserve exact JSON field names, database column names, and SynApps field names when verified.
+6. Clearly separate current implementation behavior from proposed requirements.
+7. If mapping changes are not identified, state: "No SynApps mapping changes identified" or "No database mapping changes identified."
+8. If the relevant code or design is insufficient to confirm changes, state "Unable to verify" rather than claiming there are no changes.
+9. Do not invent database fields, SynApps attributes, tables, or transformations.
+10. Ensure every mapping change is supported by the Mermaid design and/or actual existing implementation.
+
+The purpose is to document **what mapping behavior must change**, leaving the detailed Java implementation decisions to the developers.
