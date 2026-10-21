@@ -1,25 +1,41 @@
-Jira Enabler Summary: MPQ Proof Integration
-Title: Enable MPQ integration with Synapse proof verification API
+The team discussed tokenization for transactions and Pay Later suspend reasons as separate enablers, so they can be investigated and worked independently. Here are Jira-ready drafts based on the meeting.
+
+Enabler 1: Tokenization for Transactions
+Title: Enable stored payment token response for transactions
 
 Description
-Enable MPQ to receive the proof/prefill identifier from the client and use it to retrieve proof-verification details from Synapse. MPQ will then process the application and send the application information, including the proof details, to Synapse as part of the existing application flow.
+Investigate and document how MPQ will return a stored payment token to a partner when the feature is enabled for that partner. MPQ already has tokenization integrations for other scenarios; this change requires a new partner-specific custom attribute and integration with a separate stored payment token API. When enabled, MPQ should return the stored payment token instead of the regular token.
 
-The client is expected to integrate with Synapse’s application prefill API before calling MPQ. That API is owned by Synapse and has six endpoints across three flows. MPQ’s work begins when it receives the identifier from the client.
+Enabler scope
 
-Scope
-Add a field to the MPQ request to receive the proof/prefill identifier. The transcript refers to this as both a flow ID and prefill ID; confirm the final field name.
-Call the Synapse proof API using that identifier and retrieve proof-specific information.
-Use the returned proof information when processing and submitting the application to Synapse.
-Review and document the Synapse API’s Swagger details, request and success-response formats, and error scenarios.
-Assess connectivity from MPQ environments to the Synapse API, including required network and infrastructure changes.
-Technical considerations and dependencies
-The Synapse API is hosted on AWS EKS. Verify connectivity from the PCF non-production environment first.
-Confirm the path and approvals needed for production connectivity from on-premises MPQ to AWS.
-Identify any required firewall rules, access permissions, or other infrastructure changes.
-If connectivity is blocked, engage the Ecom team and Synapse team to determine an alternative, such as an API deployment in another environment.
-MPQ should pass the identifier to Synapse without validating its format. Synapse is expected to validate it; an unknown identifier may return 404 Not Found.
+Review the existing MPQ tokenization flows and how account information, echo numbers, and tokenized account numbers are currently returned.
+Confirm how the existing tokenization behavior is controlled, including the relevant flags or custom attributes.
+Identify the required custom attribute for enabling stored payment tokens for a partner.
+Review the stored payment token API contract: request, response, errors, and required integration details.
+Document how MPQ will obtain the stored token and include it in the API response.
+Identify expected behavior for API errors, missing tokens, or other failure scenarios; confirm whether any fallback to the regular token is required.
 Enabler exit criteria
-The request-field name and API contract are documented.
-Synapse success and error scenarios, including not-found behavior, are understood.
-Non-production and production connectivity paths, required approvals, and blockers are documented.
-Open questions and dependencies are captured so implementation can proceed when resolved.
+
+Existing tokenization behavior and the new stored-token flow are documented.
+The custom attribute, API contract, response mapping, and error handling are understood.
+Open questions, dependencies, and test scenarios are captured for implementation.
+Enabler 2: Pay Later Suspend Reason
+Title: Assess and define Pay Later training-suspend handling
+
+Description
+Investigate how MPQ should handle the new training suspend reason for Pay Later, using the existing legislative-suspend implementation as a reference. Determine where the suspend check should occur, how MPQ should respond when a partner is suspended, and whether a training-suspend bypass flag is needed.
+
+Enabler scope
+
+Review the existing legislative-suspend flow, including the Rapid match and validate service called through Shared Flow.
+Document how suspend reasons are returned and how MPQ currently responds to a suspend.
+Inspect the relevant Shared Flow and PCF/MPP code to determine what suspend checks or bypass logic already exist, and whether any MPP logic was removed or changed.
+Determine whether changes are needed at the Shared Flow layer, the MPP layer, or both; identify any related PCF changes.
+Confirm whether a training-suspend bypass flag is required as a custom attribute, and define the expected behavior if it is set.
+Capture required error/response behavior and testing scenarios for suspended and bypassed applications.
+Enabler exit criteria
+
+The existing legislative-suspend behavior and relevant code paths are documented.
+The required handling for training suspend—including bypass behavior—is confirmed.
+The affected components, dependencies, open questions, and implementation/testing needs are recorded.
+Open question to resolve: Is a training-suspend bypass flag required, and if so, should it be configured as a partner custom attribute?
