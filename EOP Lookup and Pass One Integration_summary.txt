@@ -1,0 +1,66 @@
+EOP Lookup and Pass One Integration
+October 21, 2026
+
+Overview
+
+The team discussed the architectural approach for unifying API endpoints and managing data isolation between Pass One and EOP Lookup flows.
+
+API Architecture
+Speaker 1 proposed moving toward a unified API to avoid repetitive endpoints for single PQ, MPQ, and quick screens, suggesting that future capabilities should be incremental. Speaker 2 noted that while an orchestration layer could handle different types, the downstream requirements are not yet fully defined. The discussion highlighted the need for a single consumer-facing endpoint that can serve both Pass One and EOP Lookup to prevent partner confusion regarding why multiple endpoints exist for different hosting environments.
+
+Data Management
+Speaker 1, Speaker 2, and Anisha debated how to store and isolate session data in the pre-qual proof data table.
+* Status Isolation: There is a concern that using the same record for both flows would allow one process to overwrite the status of another. For example, if a successful Pass One ownership check is overwritten by a failed EOP Lookup, it could trigger incorrect scheduler behavior.
+* Unique Identifiers: Speaker 2 suggested using unique key IDs with suffixes (e.g., appending "EOP" to the client-ARID) to create separate database entries for each flow.
+* PII Retention: Speaker 1 argued against extending the current retention period to 30 days to avoid redundant data. Instead, they discussed sourcing necessary PII from other tables like the create application data table or via network calls to the consumer DB.
+
+Technical Risks
+The team identified several unresolved technical challenges regarding idempotency and polling:
+* How will idempotency be maintained across different endpoints if they share the same underlying code for OTP operations?
+* If a separate record is created for EOP, how will the existing polling mechanism—which currently relies on the standard unique key ID—be updated to recognize the correct context?
+* What specific fields from the Pass One payload are strictly required to complete an ownership check during an EOP Lookup without storing the entire payload?
+
+Action Items
+
+- Check the retention period for the pre-qual proof data table.
+- Perform offline analysis of the EOP lookup design, including required transmit/PII data, status tracking and record separation, data sources and retention, lookup sequencing, and polling implications; report back and regroup on the design.
+
+Outline
+
+Unified API Strategy
+
+- Speaker 1 proposes moving toward a unified API to prevent repetitive endpoints for single PQ, MPQ, and quick screen lookups.
+- The team discusses using an orchestration layer to handle different flows like PQ or MPQ while providing a single endpoint for consumers.
+- Speaker 1 notes that current separate endpoints for hosted vs. partner-hosted services cause confusion for partners.
+
+EOP Lookup Implementation
+
+- The discussion shifts to how the EOP consumer endpoint supports graph channel and Tempas lookups, specifically for Amazon web applications.
+- Speaker 1 explains that versatile integrations via provider center, CSS, and IHS require visibility into all offers returned by the EOP consumer lookup endpoint.
+- The team considers whether the EOP lookup should be incremental to accommodate future quick screen or pre-screen needs.
+
+Authentication and Data Management
+
+- Speaker 2 raises concerns about authentication requirements and the need for additional fields when using the same pre-qual root data table.
+- The group discusses using unique ID combinations, such as partner ID with Abref ID or client with Abref ID, primarily for Amazon.
+- There is a debate on whether Pass One and EOP lookup processes will overlap or conflict during execution.
+
+Data Isolation and Status Tracking
+
+- Speaker 1 asserts that EOP lookup should only occur after an offer is persisted and Pass One reaches status 0065.
+- To prevent conflicts in the pre-qual proof data table, the team explores using unique identifiers to differentiate between Pass One and EOP lookup records.
+- Speaker 2 suggests adding a suffix like "EOP" to the unique key ID to ensure separate entries in the database.
+
+Idempotency and Security Concerns
+
+- The team evaluates idempotency for OTP operations, noting that they are currently stored as JWTs in the pre-qual proof data table.
+- Speaker 2 expresses concern that without differentiation, an EOP lookup might inadvertently use or overwrite the OTP retry limits from a Pass One session.
+- The group discusses the necessity of isolating application statuses so that a successful Pass One ownership check does not incorrectly validate an EOP lookup.
+
+Database Optimization and Retention
+
+- The participants discuss whether to extend the retention of the pre-qual proof data table to 30 days or source PII data from other tables like the create application data table.
+- Speaker 1 argues against extending retention due to potential redundancy and performance impacts on response times.
+- The team concludes that they need to perform an offline analysis to determine the optimal way to source PII data and manage status tracking separately for Pass One and EOP lookup flows.
+
+Generated by https://otter.ai
