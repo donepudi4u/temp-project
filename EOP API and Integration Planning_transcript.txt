@@ -1,0 +1,185 @@
+Speaker 1  00:01
+With that team and the notes from that meeting, it's on the Confluence page, so you can go there and you can read the notes. And I've also got a recorded recap somewhere that can be listened to. Actually, probably not because that was last week, and I don't think the recording stays. So, but you can read it all. Shrikanth, can you explain to the team EOP API? Can you explain to the Mavericks what is going to be needed for this project, please?
+
+Speaker 2  00:33
+Sure. I think you guys are familiar with what we are doing for Amazon, right? We're we're going to create a new API, lookup API for standalone three calls. So hope you all familiar with EOP capability, right? Let me know if you guys need recap quickly. Yeah. explain. So it's it's like logic to expand the EOP capability for other partners, other integrations. Right now, what we have is like DApply supports the EOP capability initially, and then they expanded this much journals like Provider Center, IHS, CSS during the health and wellness side. But they all come through PCF. They they all do a lookup PRD apply update. So when when there is a pre-qual abandon, customers will get a targeting email from CDP, and there is a there will be a link in the email. Customer can click on that link and they go to DeApply, and DeApply will do a proof authentication and then do a lookup. So we have created a new lookup endpoint which supports lookup based on a PII or app key. Frontends will pass app key if they have app key, which is key code. Otherwise, we will get four PIIs: last name, zip code, last four of SSN, and mobile phone number. So, for the given combination, we do a lookup in our database, and then call synapse with the PK repro as a register value, and they do a lookup and all the validations. It's PQR is very much similar to PRUNATA, they do a soft pull and then rerun the initial checks and then return the same offer or revised offer or even decline if the offer is no longer valid. So that is what we have today with reapply, and we are offering same capability to external partners. So first integration that we started with is Amazon, right? So we are doing enabler, and where we wanted to expose that lookup endpoint via PG, and that supports standalone break call, regular break call, not MBQ. Any any questions? Are you guys following what I'm explaining? So in the lookup process, two main things, right? One the payload, and two authentication. So when it comes to Amazon, they said like they are not going to send all four PIA fields. So we made it be agreed to collect two PIA fields like SSN and phone number, right? So based on that, we do a lookup in our database. We also get the app for Amazon. Like they they will be using ERID. So we have to support both the key code and and the ERID or the reference ID, and then do a lookup and then initiate authentication on our side, right? Similar to pass one. So that is what we are going to support for Amazon, and for other integrations, it's still four PI fields are required. And the scope what we have for this initiative is like versatile. Versatile is like one of the third party. Verstel itself is not a client, but they have their own clients, right? So it's a platform where they offer all these integrations, product integrations with multiple lenders. Synchrony is one of them. So for versatile integration, we are going to support exact implementation. What we have for the apply. So number one, we need to target the send the emails, right? If we get a prequal application, be it regular prequal, standalone precall, or MPQ. We still have to support both, and there is no acceptance within 30 minutes. We should send an email to customer. So the recurring logic resides within CDP. From our perspective, what we do is we look for the offer expiry date, which is a kind of a EOP flag for us. So whenever there is an pre-qual approval, password approval from Synapse. We check for EOP expiry date. If there is an expiry date, we send application details to CDP via Ravitation Q. We have an application EOP consumer that will read the messages from Ravitium Q and then push it to CDP. So the whenever there is an offer created, there will be a message sent to CDP, and they will hold the logic of that, like 30 minutes or 60 minutes, whatever it is, for that channel. And if there is no update received within that window, like 30 minutes, they will send the lookup email. So this is what we have to do with passband. It is similar to the apply.
+
+Speaker 2  06:52
+We have to send a message to CDP, and CDP is going to trigger the email if there is no acceptance received within the session timeout. That's the number one, and two. We have to add the expiry date in the API response, date standalone recall or MPQ. In both proxies, we have to return the expiry date, so they know that this half publication is EOP enabled, and there is an expiry date of 30 days. That's the second change as part of the the past one. It's a right initial offer, and then for synchronous applications or channels, the UP email will have a link to DApply, right? So the email will or CDP will create a link for DApply, so that when customer clicks on that link, they'll be presented with a DFL screen, which is approved landing page. But for third-party integrations, customers will be on a different platform, right? They will probably on Amazon product or Amazon website or application or even versatile for this kiosk or their own internet application, they'll be on a different platform, right? So customer should go back to the same platform to do a lookup. So here, couple of things when it comes to retargeting the emails that from Amazon, they're not going to do any emails, email communication from our end. All we do is we just send the an indicator like offer expiry date that this offer is persisted for 30 days or 29 days, whatever it is, and then we suppress the emails for Amazon, so Amazon do not want Synchron to send an email. So there is a field called suppress UP emails in the CDP API. So we need to set that custom attribute in the API for Amazon, and and we will still continue to send the payload data to CDP, but based on this plug, they will submit the retargeting emails. And for versatile, what we are going to do is they want Synchrony to send an email, but the email should have a link to versatile. So we are going to add an additional input field where we collected lookup URL. We need to properly name the field and then accept that URL and pass it to CDP. So CDP is going to make a change based on this URL. They will include it in their email template, right? Whatever they send to customer, if you pass that URL, they'll be they'll use the same URL. Otherwise, they'll create a data share or whatever the link that they that they are creating for the apply. Any questions here?
+
+Speaker 3  10:36
+Hi, for the second, we are not suppressing. We are just customizing the email, right? Email,
+
+Speaker 2  10:42
+correct? Whatever.
+
+Speaker 3  10:42
+Okay. For Amazon, how is it? We will be suppressing the email, and how are we gonna target customers?
+
+Speaker 2  10:50
+For for Amazon, I think we don't send email. If you guys familiar with what we do for QuickSlain, QuickScreen, what we do is partners will run like 280 call or quick screen check behind the scenes whenever customer logs into their application or whenever the customer is at the checkout process. Right? They do a quick screen. Customer has no knowledge that partner is doing or merchant is doing a screen check on their application or their profile. So with minimal PII, we go to bureau and see if there is a offer available for that customer. Right? If it is there, they'll just present that offer with the customer whenever based on the integration or the flow whatever they build either during the logging when you log into Amazon they'll or one day they'll show that you have you are eligible for one pay card or Amazon card or during the checkout process whether you are at the register or in store, or whether you are online, they'll trust, and that offer that you are eligible for this so and so product, and this is your rewards. You can you can take that offer and and complete your purchase process. That is what we do with quick screen and producting. I think propose the same solution for prequal as well with Amazon. So there won't be any targeting email sent to customer, but when there is an offer created with EOP, and then customer did not take it within two hours, like Amazon has two session, so they they are going to persist that offer and represent whenever they come back Login. So retargeting is managed by Amazon itself, Masan.
+
+Speaker 3  13:10
+Okay. Okay. So Amazon is doing that.
+
+Speaker 2  13:12
+Yeah. Yeah. So they they have to like crack that session and then persist that offer on their end and show that offer, display that offer whenever they come back.
+
+Speaker 3  13:23
+all
+
+Speaker 2  13:26
+about like the first part of the EOP, right, where we get the application and how we trigger the email, and then what we have to send back to partner if the application is evocally enabled, and the the second piece is that lookup process side said like we are going to support app key based lookup and PI based lookup, so it is it is expected that partner can do a lookup lookup with just PIA fields. They said like we need four PIA fields. They can do a lookup without app key, and on outside we have to go to our database and pull the most recent prequel app. It is possible there could be multiple prequel applications created for that customer, right? So we have to filter out. We should exclude apps that are completed fully, meaning like past was done. Also, if there are multiple or there is another app without EOP, we should exclude that app As well, so our such criteria should retrieve the the app which is in past one of the old state, and you will be enabled, and and the latest application. If there are multiple, we have to pick the most recent one. Okay, and then if we found an application, an offer on our side, so authentication is mandatory here, right? So for Amazon, we said like we're going to follow the the same pass one approach where we do OTP with brew and even in the EOP lookup also we have to do same thing so we have to do ownership check and then position check and then when the brew is verified we have to populate all those brew attributes SP code ID verification code and and call synapse with PQ replo. So that is for Amazon. And versatile is similar to D apply, right? So they are going to host proof on their end. What it means is that we have to add all proof fields. What are we are collecting today from DApply in in PKU same fields we need to add, and we need to bypass any other authentications or like the authentication that we are going to build for Amazon, right? So that we need to suppress for versatile. We should not do any authentication. We need to just add all the proof fields, authentication-related fields in the API, and collect that information versatile. So take all those inputs and then do a lookup internally against our database, and then call Syrams PKL Pro. Any any questions? So it is it is same for both standalone brick wall and MPQ. There is no different difference. It's just that we have to support both the products. Response payload for regular equal versus MPQ is different. So that that that is only like a difference in terms of the products. Otherwise, we need to do same thing in terms of the lookup and authentication, and when it comes to lookup for MPQ, if you guys remember last when during PRQ INAT, we collect the set pay product configured from front ends. If it is like MPQ proxy, we go to MPP and get that information from Rapid and and pass it Synapse and TRQ and IT right, and we also need same information PQ repro as well. So in case of an MPQ application lookup, we have to pass that set pay product configuration in PQ repro as well, and and coming to the scope for MPQ only versatile is scoped. Even for three qual answer, three qual Amazon is there, but it is a separate intake. So we don't need to worry about any other authentication types. Each each each partner will have their own preference or their own way of implementing authentication at pass one, and we have to honor same thing during lookup also. So since we are scoping only versatile and versatile will follow similar prove process like dapply, and they do prove, and they just need to collect all that information during past one. This is we we are already doing that, and then they have to do same thing with lookup as well. Pick it up. Any any questions? From from a enabler perspective, I think you know last time we were thinking of creating two endpoints in in create apply proxy and NPQ proxy. that may not be may not work with future enhancements.
+
+Speaker 2  20:29
+Like I was talking to Michelle Matthews during the health and wellness, like certification testing when I was in office. So they they were trying to enhance this lookup experience to support other products as well. Like I was explaining about quick screen, right? Quick screen is also one one experience where we do soft inquiry for a revolving product, And and if customer is eligible for a quick screen evolving product through quick screen, that offer is persisted for 60 days or 90 days based on the merchant configuration. And we have similar process where we do Quick screens as a badge. It's called like pre-screen, where merchant will provide their customer information through a file, and Synchrony will process all all those customers offline and give them offer IDs in a file back to the merchant, and we communicate those offers to customers through synchrony or even platform partner through emails and letters. It's called like pre-screen. That is also a evolving product. So they they were thinking to include all those offers in the lookup process. So in future, like when when they do a lookup with this API, our API should be able to return any type of offer, like an offer created through a standalone pre-qual, and offer created through MPQ, and offer created through quick screen or pre-screen. So, I think we'll have to see how best we can design this new lookup API and specs one in point versus multiple, or how the spec going to look like? I think that's all on a high level, like some flow perspective. Two parts: one, like how we create an offer and how we communicate that offer back to customer, and the second part is like how customer can access that offer again later.
+
+Speaker 4  23:38
+Questions? Deb team, do we have any questions?
+
+Speaker 1  24:24
+All right. If there's no questions, then are we ready to groom this enabler? What are we thinking? Story points for this enabler.
+
+Speaker 4  24:50
+3555, Okay.
+
+Speaker 1  25:05
+Thumbs up for five. All right. Thank you.
+
+Speaker 4  25:22
+I'll move the sentence due. All right. So the proof those have been moved to the top.
+
+Speaker 1  26:09
+Um, MPQ API. So this was the last two tokenization and ad suspend reason for pay later for Dorothy, the last this is enabled for the last two Dorothy stories. Who Delete? Do you want to talk about this? Who or who would like to talk about these two these two projects?
+
+Speaker 5  26:36
+So we are sorry. We already discussed about this one mission yesterday. Obviously, explained this. Walk us through yesterday. and he's ready to be like moved to Todo. I think I thought like you know you already moved to Todo. Did you create a one separate one or
+
+Speaker 1  26:53
+okay? So we were good with the three points then.
+
+Speaker 5  26:56
+Yep.
+
+Speaker 4  26:57
+Okay. Yes. Okay. All we need to do. Okay. There, it's in to do now. No, I've put a label at the beginning of it.
+
+Speaker 1  27:17
+There we go. I don't know what happened right there, but let me make sure it's where it's supposed to be.
+
+Speaker 4  27:26
+There you go. Okay.
+
+Speaker 1  27:30
+That's the one I need to create a feature for. We actually need a different. Well, I guess doesn't matter. I'll create a different feature for that one also. Okay, so we've got this one, and we've got this one, and we've got this this one. But we need an enabler right here still. I need to create that EOP for Amazon. You are working on this, correct?
+
+Speaker 3  28:12
+Yes.
+
+Speaker 4  28:13
+Okay. Oops, wrong spot. This
+
+Speaker 1  28:18
+is in progress. Okay. So yeah, we're doing pretty much everything that we can do. Lots of enablers in progress. Okay. Well, I think until we get these enablers done, what else do we want to look at? Do we want to look at the list and see if there's any work that we can pull in that's ready for build right now. Or Shrikanth, Bamshi, Talib, what do you want to do? I don't think there's anything ready to go where we would have grabbed it by now.
+
+Speaker 6  28:57
+Yeah.
+
+Speaker 3  29:00
+Yesterday I remember we were asking separate enablers for tokenization versus suspend design, right? Are we okay to have one enabler or
+
+Speaker 1  29:09
+we just did that?
+
+Speaker 5  29:10
+Yeah, I created both command into one boundary team one. Yeah, we just we just
+
+Speaker 1  29:14
+did another enabler for we have we have an enabler for tokenization and add suspend. We just did enabler for these two. They've got the I
+
+Speaker 3  29:23
+thought team need two enablers to separate for one one for tokenization and one for sustained reason. Maybe I'm wrong. Are we? So did you check the name? Are we okay with one enabler for both?
+
+Speaker 5  29:35
+Yeah, S M G. So I comment one into one.
+
+Speaker 7  29:37
+I'm sorry.
+
+Speaker 3  29:38
+Okay. Okay.
+
+Speaker 1  29:51
+Okay. Well, I keep going through the feature lists and keep finding new things to schedule tech walkthroughs for as I get them in, and if we can come up with things, and yeah, if we can, yeah, I have a feeling all these enablers are going to get done, and we're going to get loaded with works. So hopefully, the product teams will figure out their scope quickly, and all the other dependency teams can, you know, get their solutions, and we can get going. Anything else? Shri Gong Bamchi, Philippe.
+
+Speaker 3  30:39
+Oh, hi, Bamchi. Amit. Okay. I think we discussed to have two separate enablers for this 41 and 55 Bamsi.
+
+Speaker 5  30:52
+Yeah. Right. Right. Amit. And this morning, like you know, some of them want to add these two into same enabler. Add into one enabler. Yeah, in the meeting, like you know, yesterday, we thought of creating a separate ones. But in the morning, like you know, without of adding into one enabler, so I added
+
+Speaker 3  31:16
+that. If we want separate, we can separate.
+
+Speaker 5  31:19
+Yeah, if you need either a separate one, if you have different opinion on that, so can I can split that into two?
+
+Speaker 3  31:30
+Yeah, can we do that? Okay. I think we'll be having separate time under Michelle. You might have to remove that. Yeah. Yeah.
+
+Speaker 5  32:04
+I'll have a reminder, Michelle. Since I'll be doing, we have.
+
+Speaker 4  32:20
+Okay. Okay.
+
+Speaker 1  32:45
+Let me know when you're done.
+
+Speaker 5  36:02
+Yeah, just. cloned it and added to the todo status machine.
+
+Speaker 4  36:06
+Okay.
+
+Speaker 5  36:08
+3246332432463.
+
+Speaker 8  36:17
+Hmm.
+
+Speaker 1  36:44
+Okay. Now you have these both as three story points, but you had both them. Okay. Well, we'll just leave it.
+
+Speaker 9  36:55
+Okay.
+
+Speaker 1  37:16
+All right, and I'm gonna get rid of this from the ends of it.
+
+Speaker 4  37:30
+All right,
+
+Speaker 1  37:39
+lots of enablers. Okay, there we go. It's a spend reason, and these two need new features. Okay. Well, lots of lots of enablers. They're in order. Be okay. Okay. All right. Anything else? Yeah,
+
+Speaker 5  38:06
+this other way we haven't looked at them.
+
+Speaker 1  38:14
+All right. Well, it's 1120. There's nothing else I can let everybody go.
+
+Speaker 4  38:23
+Are we all good?
+
+Speaker 3  38:27
+Yes.
+
+Speaker 1  38:28
+All right. Done. I'll talk your ones. I will let everybody go. Have a great rest of your Wednesday. Have a wonderful day. I'll talk to y'all later. Thank you. Bye bye.
+
+Speaker 3  38:41
+Thank you.
+
+
+Transcribed by https://otter.ai
